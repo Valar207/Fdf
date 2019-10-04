@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "mlx.h"
+#include "../minilibx/mlx.h"
 #include "libft/libft.h"
 
 void	ft_parallele_bis(t_env *e, int i, int j)

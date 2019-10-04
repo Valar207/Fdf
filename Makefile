@@ -10,11 +10,23 @@
 #                                                                              #
 # **************************************************************************** #
 
+RED = \033[31m
+GREEN = \033[32m
+YELLOW = \033[33m
+
 NAME = fdf
-CC = gcc
-HEADERS = libft.h
-FLAGS =  -Wall -Wextra -Werror
-FILES = src/main.c \
+
+FLAGS = -Wall -Wextra -Werror
+
+MLX_FLAGS = -lmlx -framework OpenGL -framework AppKit
+
+LIB_PATH = ./src/libft/
+
+LIB = ./src/libft/libft.a
+
+MLX_PATH = ./minilibx/
+
+SRCS =  src/main.c \
 		src/get_coord.c \
 		src/draw_line.c \
 		src/ft_print_map.c \
@@ -24,21 +36,41 @@ FILES = src/main.c \
 		src/init_var.c \
 		src/key_events.c \
 		src/fill_pix.c
-LIB = ./src/libft/libft.a
 
-OBJ =	$(FILES:.c=.o)
+OBJ = $(SRCS:.c=.o)
+
+DEPS = $(SRCS:.c=.d)
 
 all: $(NAME)
 
-$(NAME):
-	$(CC) -o $(NAME) -I /usr/local/include $(FILES) -L /usr/local/lib -lmlx $(LIB) -framework openGL -framework AppKit
+$(NAME): $(LIB) $(OBJ)
+	@gcc $(FLAGS) $(OBJ) -o $(NAME) $(LIB) -L $(MLX_PATH) $(MLX_FLAGS)
+	@echo "$(YELLOW)./$(NAME) $(GREEN)ready   ✅ "
 
-clean: 
-	rm -rf $(OBJ)
+-include $(DEPS)
+
+./%.o : ./%.c makefile
+	@gcc $(FLAGS) -I $(LIB_PATH) -MMD -MP -c $< -o $@
+
+$(LIB) : force
+	@make -C $(LIB_PATH)
+
+force :
+
+clean:
+	@rm -f $(OBJ)
+	@echo "$(YELLOW).o    $(RED)deleted 💯 "
+	@rm -f $(DEPS)
+	@echo "$(YELLOW).d    $(RED)deleted 💯 "
+	@make clean -C $(LIB_PATH)
 
 fclean: clean
-	rm -rf $(NAME)
+	@rm -f $(NAME)
+	@make fclean -C $(LIB_PATH)
+	@echo "$(YELLOW)./$(NAME) $(RED)deleted 💯 "
 
 re: fclean all
 
-.PHONY : all clean fclean re
+.SILENT:
+
+.PHONY: all clean fclean re force
