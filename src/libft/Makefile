@@ -11,7 +11,6 @@
 # **************************************************************************** #
 
 NAME = libft.a
-CC = gcc
 HEADERS = libft.h
 FLAGS = -Wall -Wextra -Werror
 FILES = ft_memset.c \
@@ -78,23 +77,34 @@ FILES = ft_memset.c \
 		ft_recursive_power.c \
 		ft_sqrt.c \
 		get_next_line.c \
-		ft_split_moi.c \
 		ft_free_tab_int.c \
 		ft_free_tab_char.c
 
 OBJ =	$(FILES:.c=.o)
 
+DEPS = $(SRCS:c=.d)
+
 all: $(NAME)
 
-$(NAME):
-	$(CC) $(FLAGS) -c $(FILES)
-	ar rc $(NAME) $(OBJ)
-	ranlib $(NAME)
+$(NAME): $(OBJ)
+	@gcc $(FLAGS) -c $(FILES) -I $(HEADERS)
+	@ar rc $(NAME) $(OBJ)
+	@ranlib $(NAME)
 
-clean: 
-	rm -rf $(OBJ)
+-include $(DEPS)
+
+./%.o : ./%.c makefile
+	@gcc $(FLAGS) -I -MMD -MP -c $< -o $@
+
+clean:
+	@rm -f $(OBJ)
+	@rm -f $(DEPS)
 
 fclean: clean
-	rm -rf $(NAME)
+	@rm -f $(NAME)
 
 re: fclean all
+
+.SILENT:
+
+.PHONY: all clean fclean re
